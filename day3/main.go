@@ -127,9 +127,7 @@ func IntersectingPointsOnLines(linesA []Line, linesB []Line) []Point {
 		for _, otherLine := range linesB {
 			intersects, intersectionPoint := line.IntersectsSegment(&otherLine)
 			if intersects {
-				fmt.Printf("* Intersection line1=%v line2=%v at %s\n", line, otherLine, intersectionPoint)
-				fmt.Printf("** Intersection l1:%d\n", line.TotalDistance(intersectionPoint))
-				fmt.Printf("** Intersection l2:%d\n", otherLine.TotalDistance(intersectionPoint))
+				// fmt.Printf("* Intersection line1=%v line2=%v at %s\n", line, otherLine, intersectionPoint)
 				points = append(points, *intersectionPoint)
 			}
 		}
@@ -145,9 +143,7 @@ func IntersectingPointsAbsDistanceOnLines(linesA []Line, linesB []Line) []int {
 		for _, otherLine := range linesB {
 			intersects, intersectionPoint := line.IntersectsSegment(&otherLine)
 			if intersects {
-				fmt.Printf("* Intersection line1=%v line2=%v at %s\n", line, otherLine, intersectionPoint)
-				fmt.Printf("** Intersection l1:%d\n", line.TotalDistance(intersectionPoint))
-				fmt.Printf("** Intersection l2:%d\n", otherLine.TotalDistance(intersectionPoint))
+				// fmt.Printf("* Intersection line1=%v line2=%v at %s\n", line, otherLine, intersectionPoint)
 				distanceValues = append(distanceValues,
 					line.TotalDistance(intersectionPoint)+otherLine.TotalDistance(intersectionPoint))
 			}
@@ -167,7 +163,6 @@ func (l *Line) TotalDistance(point *Point) int {
 		p = p.Parent
 	}
 
-	fmt.Printf("*** parentDistance=%d pointDistance=%d\n", parentDistance, l.Start.Distance(point))
 	return parentDistance + l.Start.Distance(point)
 }
 
