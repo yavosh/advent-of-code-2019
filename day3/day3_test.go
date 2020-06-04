@@ -84,34 +84,4 @@ func TestClosestIntersectPoint(t *testing.T) {
 			fmt.Sprintf("ina:%s inb:%s expected abs distance [%d!=%d]", testCase.inA, testCase.inB, testCase.expectedAbsDistance, absDistance),
 		)
 	}
-
-	t.FailNow()
-}
-
-func TestRunCode(t *testing.T) {
-
-	// rx0 NaN ry0 1.4 rx1 1 ry1 NaN
-	// rx0 NaN ry0 0.6666666666666666 rx1 0.75 ry1 NaN
-	// res { x: 3, y: 3 }
-
-	linesA := linesFromInput(test1InputA)
-	linesB := linesFromInput(test1InputB)
-
-	for _, line := range linesA {
-		fmt.Printf("LineA %v\n", line)
-	}
-
-	for _, line := range linesB {
-		fmt.Printf("LineB %v\n", line)
-	}
-
-	for _, line := range linesA {
-		for _, otherLine := range linesB {
-			intersects, intersectionPoint := line.IntersectsSegment(&otherLine)
-			if intersects {
-				fmt.Printf("* Intersection line1=%v line2=%v at %s\n", line, otherLine, intersectionPoint)
-			}
-		}
-	}
-
 }

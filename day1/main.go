@@ -109,22 +109,50 @@ var (
 140916`
 )
 
-func getFuel(weigth int) int {
+func getFuelForMass(weigth int) int {
+	if weigth/3 < 2 {
+		return 0
+	}
+
 	return (weigth / 3) - 2
+}
+
+// get fuel requerement for mass's fuel
+// returns only the extra required fuel for the weight's fuel
+func getFuelMassFuel(weigth int) int {
+
+	massFuel := getFuelForMass(weigth)
+	if massFuel == 0 {
+		return massFuel
+	}
+
+	fuelMassFuel := massFuel
+	fuelMassFuelTotal := 0
+
+	for fuelMassFuel == -1 || fuelMassFuel > 0 {
+		//fmt.Printf("fuelMassFuel=%d\n", fuelMassFuel)
+		fuelMassFuel = getFuelForMass(fuelMassFuel)
+		fuelMassFuelTotal = fuelMassFuelTotal + fuelMassFuel
+		//fmt.Printf("fuelMassFuel=%d fuelMassFuelTotal=%d\n", fuelMassFuel, fuelMassFuelTotal)
+	}
+
+	return fuelMassFuelTotal
 }
 
 func main() {
 
 	var total = 0
+	var totalForMassFuel = 0
 	components := strings.Split(input, "\n")
 
 	for _, moduleWeightString := range components {
 
 		moduleWeight, _ := strconv.Atoi(strings.Trim(moduleWeightString, " \n\r"))
-		total = total + getFuel(moduleWeight)
-
-		fmt.Printf("for weight %d fuel is %d\n", moduleWeight, getFuel(moduleWeight))
+		total = total + getFuelForMass(moduleWeight)
+		totalForMassFuel = totalForMassFuel + getFuelMassFuel(moduleWeight)
+		fmt.Printf("for weight %d fuel is %d\n", moduleWeight, getFuelForMass(moduleWeight))
+		fmt.Printf("for weight %d total fuel is %d\n", moduleWeight, getFuelMassFuel(moduleWeight))
 	}
 
-	fmt.Printf("total fueld %d\n", total)
+	fmt.Printf("total modules with module's fule fuel total-for-modules=%d total-for-fuel=%d total=%d\n", total, totalForMassFuel, total+totalForMassFuel)
 }
