@@ -50,9 +50,7 @@ func opMult(codeRun int, memory *[]int) int {
 }
 
 func execute(memory []int) []int {
-
 	//fmt.Printf("code %v\n", memory)
-
 	var codeRun = 0
 	var done = false
 	for !done {
