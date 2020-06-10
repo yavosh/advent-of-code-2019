@@ -62,13 +62,13 @@ func opOutput(codeRun int, flags *[]int, mem *[]int, output *[]int) int {
 
 	if (*flags)[0] > 0 {
 		left := getValueImmediate(codeRun+1, mem)
-		fmt.Printf("OUTPUT: codeRun=%d left=%d \n", codeRun, left)
+		fmt.Printf("DEBUG: codeRun=%d left=%d \n", codeRun, left)
 		(*output)[0] = left
 		return codeRun + 2
 	}
 
 	left := getValueByAddress(codeRun+1, mem)
-	fmt.Printf("OUTPUT: codeRun=%d left=%d \n", codeRun, left)
+	fmt.Printf("DEBUG: codeRun=%d left=%d \n", codeRun, left)
 
 	(*output)[0] = left
 	return codeRun + 2
