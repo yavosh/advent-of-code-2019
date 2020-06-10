@@ -27,7 +27,9 @@ func main() {
 	input := computer.LoadInstructions(inputText)
 	_, output := computer.Run(input, []int{1})
 	fmt.Printf("result output  %v\n", output)
-	// _, outputPart2 := computer.Run(input, []int{5})
-	// fmt.Printf("result diagnostic code 5  %v\n", outputPart2)
+
+	input2 := computer.LoadInstructions(inputText)
+	_, outputPart2 := computer.Run(input2, []int{5})
+	fmt.Printf("result diagnostic code 5  %v\n", outputPart2)
 
 }

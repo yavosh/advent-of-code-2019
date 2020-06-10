@@ -49,17 +49,13 @@ func putValueAtAddress(position int, value int, mem *[]int) int {
 }
 
 func opInput(codeRun int, flags *[]int, mem *[]int, input *[]int) int {
-
 	inputValue := (*input)[0]
 	left := getValueImmediate(codeRun+1, mem)
-	// left := getValueBy(codeRun+1, (*flags)[0], mem)
-	// fmt.Printf("putValueAtAddress left=%d inputValue=%d mem[]=%d\n", left, inputValue, (*mem)[codeRun+1])
 	(*mem)[left] = inputValue
 	return codeRun + 2
 }
 
 func opOutput(codeRun int, flags *[]int, mem *[]int, output *[]int) int {
-
 	if (*flags)[0] > 0 {
 		left := getValueImmediate(codeRun+1, mem)
 		fmt.Printf("DEBUG: codeRun=%d left=%d \n", codeRun, left)
@@ -77,7 +73,6 @@ func opOutput(codeRun int, flags *[]int, mem *[]int, output *[]int) int {
 func opAdd(codeRun int, flags *[]int, mem *[]int) int {
 	left := getValueBy(codeRun+1, (*flags)[0], mem)
 	right := getValueBy(codeRun+2, (*flags)[1], mem)
-	// fmt.Printf("OP Add flags=%v left=%d right=%d\n", flags, left, right)
 	putValueAtAddress(codeRun+3, left+right, mem)
 	return codeRun + 4
 }
@@ -85,7 +80,6 @@ func opAdd(codeRun int, flags *[]int, mem *[]int) int {
 func opMult(codeRun int, flags *[]int, mem *[]int) int {
 	left := getValueBy(codeRun+1, (*flags)[0], mem)
 	right := getValueBy(codeRun+2, (*flags)[1], mem)
-	// fmt.Printf("OP Mul flags=%v left=%d right=%d\n", flags, left, right)
 	putValueAtAddress(codeRun+3, left*right, mem)
 	return codeRun + 4
 }
@@ -154,11 +148,6 @@ func Run(memory []int, input []int) ([]int, []int) {
 			(instruction / 10000) % 10,
 		}
 
-		// fmt.Printf("execute code instruction=%d opcode=%d flags=%v at addr %d\n",
-		// 	instruction, opcode, flags, codeRun)
-		// fmt.Printf("mem=%v input=%v output=%v\n",
-		// 	memory, input, output)
-
 		switch opcode {
 		default:
 			fmt.Printf("Unknown instruction %d at addr %d\n", opcode, codeRun)
@@ -184,8 +173,6 @@ func Run(memory []int, input []int) ([]int, []int) {
 		}
 	}
 
-	//fmt.Printf("result memory %v\n", memory)
-	//fmt.Printf("result output  %v\n", output)
 	return memory, output
 }
 

@@ -47,7 +47,6 @@ func TestInputOperations(t *testing.T) {
 		assert.Equal(t, testCase.outputValue, outValue,
 			fmt.Sprintf("for [%v!=%v] ", testCase.outputValue, outValue))
 	}
-
 }
 
 func TestCompareOperations(t *testing.T) {
@@ -111,8 +110,6 @@ func TestJumpOperations(t *testing.T) {
 	for _, testCase := range testCases {
 		_, outputs := computer.Run(testCase.inputCode, []int{testCase.inputValue})
 		outValue := outputs[0]
-		// assert.Equal(t, testCase.outputCode, result,
-		// 	fmt.Sprintf("for [%v!=%v] ", testCase.inputCode, result))
 		assert.Equal(t, testCase.outputValue, outValue,
 			fmt.Sprintf("for [%v!=%v] ", testCase.outputValue, outValue))
 	}
@@ -141,10 +138,5 @@ func TestWorkingExample(t *testing.T) {
 		outValue := outputs[0]
 		assert.Equal(t, testCase.outputValue, outValue,
 			fmt.Sprintf("for input %d unexpetec output [%v!=%v] ", testCase.inputValue, testCase.outputValue, outValue))
-
-		//fmt.Printf("result memory %v\n", result)
-		//fmt.Printf("result output  %v\n", outputs)
 	}
-
-	t.Fail()
 }
