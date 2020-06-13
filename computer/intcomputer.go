@@ -48,9 +48,11 @@ func putValueAtAddress(position int, value int, mem *[]int) int {
 	return (*mem)[address]
 }
 
-func opInput(codeRun int, flags *[]int, mem *[]int, input *[]int) int {
-	inputValue := (*input)[0]
+func opInput(codeRun int, flags *[]int, mem *[]int, input *[]int, inputIndex int) int {
+	inputValue := (*input)[inputIndex]
 	left := getValueImmediate(codeRun+1, mem)
+
+	fmt.Printf("inputValue=%d left=%d inputIndex=%d\n", inputValue, left, inputIndex)
 	(*mem)[left] = inputValue
 	return codeRun + 2
 }
@@ -136,6 +138,8 @@ func Run(memory []int, input []int) ([]int, []int) {
 
 	var output = make([]int, len(input))
 
+	var intputIndex = 0
+
 	var codeRun = 0
 	var done = false
 	for !done {
@@ -157,7 +161,8 @@ func Run(memory []int, input []int) ([]int, []int) {
 		case opCodeMult:
 			codeRun = opMult(codeRun, &flags, &memory)
 		case opCodeInput:
-			codeRun = opInput(codeRun, &flags, &memory, &input)
+			codeRun = opInput(codeRun, &flags, &memory, &input, intputIndex)
+			intputIndex++
 		case opCodeOutput:
 			codeRun = opOutput(codeRun, &flags, &memory, &output)
 		case opCodeJumpIfTrue:
