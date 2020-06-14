@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -51,8 +52,21 @@ func putValueAtAddress(position int, value int, mem *[]int) int {
 func opInput(codeRun int, flags *[]int, mem *[]int, input *[]int, inputIndex int) int {
 	inputValue := (*input)[inputIndex]
 	left := getValueImmediate(codeRun+1, mem)
+	(*mem)[left] = inputValue
+	return codeRun + 2
+}
 
-	fmt.Printf("inputValue=%d left=%d inputIndex=%d\n", inputValue, left, inputIndex)
+func opInputFromChannel(name string, codeRun int, flags *[]int, mem *[]int, input chan int) int {
+	inputValue := 0
+	select {
+	case res := <-input:
+		inputValue = res
+	case <-time.After(3 * time.Second):
+		fmt.Printf("input timeout name=%s\n", name)
+		panic(fmt.Sprintf("input timeout name=%s\n", name))
+	}
+
+	left := getValueImmediate(codeRun+1, mem)
 	(*mem)[left] = inputValue
 	return codeRun + 2
 }
@@ -60,16 +74,29 @@ func opInput(codeRun int, flags *[]int, mem *[]int, input *[]int, inputIndex int
 func opOutput(codeRun int, flags *[]int, mem *[]int, output *[]int) int {
 	if (*flags)[0] > 0 {
 		left := getValueImmediate(codeRun+1, mem)
-		fmt.Printf("DEBUG: codeRun=%d left=%d \n", codeRun, left)
+		fmt.Printf("* DEBUG OUTPUT: codeRun=%d left=%d  \n", codeRun, left)
 		(*output)[0] = left
 		return codeRun + 2
 	}
 
 	left := getValueByAddress(codeRun+1, mem)
-	fmt.Printf("DEBUG: codeRun=%d left=%d \n", codeRun, left)
-
+	fmt.Printf("* DEBUG OUTPUT: codeRun=%d left=%d\n", codeRun, left)
 	(*output)[0] = left
 	return codeRun + 2
+}
+
+func opOutputIntoChannel(name string, codeRun int, flags *[]int, mem *[]int, output chan int) (int, int) {
+	if (*flags)[0] > 0 {
+		left := getValueImmediate(codeRun+1, mem)
+		fmt.Printf("* DEBUG OUTPUT: codeRun=%d left=%d  \n", codeRun, left)
+		output <- left
+		return codeRun + 2, left
+	}
+
+	left := getValueByAddress(codeRun+1, mem)
+	fmt.Printf("* DEBUG OUTPUT: codeRun=%d left=%d\n", codeRun, left)
+	output <- left
+	return codeRun + 2, left
 }
 
 func opAdd(codeRun int, flags *[]int, mem *[]int) int {
@@ -179,6 +206,55 @@ func Run(memory []int, input []int) ([]int, []int) {
 	}
 
 	return memory, output
+}
+
+// RunWithChannels run but inputs and outputs are callbacks
+func RunWithChannels(memory []int, name string, input chan int, output chan int, exit chan int) ([]int, int) {
+
+	var intputIndex = 0
+	var lastOutput = 0
+
+	var codeRun = 0
+	var done = false
+	for !done {
+		instruction := memory[codeRun]
+		opcode := instruction % 100
+
+		flags := []int{
+			(instruction / 100) % 10,
+			(instruction / 1000) % 10,
+			(instruction / 10000) % 10,
+		}
+
+		switch opcode {
+		default:
+			fmt.Printf("Unknown instruction %d at addr %d\n", opcode, codeRun)
+			os.Exit(99)
+		case opCodeAdd:
+			codeRun = opAdd(codeRun, &flags, &memory)
+		case opCodeMult:
+			codeRun = opMult(codeRun, &flags, &memory)
+		case opCodeInput:
+			codeRun = opInputFromChannel(name, codeRun, &flags, &memory, input)
+			intputIndex++
+		case opCodeOutput:
+			codeRun, lastOutput = opOutputIntoChannel(name, codeRun, &flags, &memory, output)
+		case opCodeJumpIfTrue:
+			codeRun = opJumpTrue(codeRun, &flags, &memory)
+		case opCodeJumpIfFalse:
+			codeRun = opJumpFalse(codeRun, &flags, &memory)
+		case opCodeLessThan:
+			codeRun = opLessThan(codeRun, &flags, &memory)
+		case opCodeEquals:
+			codeRun = opEquals(codeRun, &flags, &memory)
+		case opCodeExit:
+			//fmt.Printf("*********** Program done name=%s out=%d\n", name, lastOutput)
+			done = true
+			exit <- lastOutput
+		}
+	}
+
+	return memory, lastOutput
 }
 
 // LoadInstructions .
