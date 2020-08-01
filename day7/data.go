@@ -2,7 +2,7 @@ package main
 
 var (
 	// 0,1,2,3,4
-	permutations = [][]int{
+	permutations = [][]int64{
 		{0, 1, 2, 3, 4},
 		{1, 0, 2, 3, 4},
 		{2, 1, 0, 3, 4},
@@ -125,7 +125,7 @@ var (
 		{0, 2, 1, 4, 3},
 	}
 
-	permutations5to9 = [][]int{
+	permutations5to9 = [][]int64{
 		{5, 6, 7, 8, 9},
 		{6, 5, 7, 8, 9},
 		{7, 6, 5, 8, 9},

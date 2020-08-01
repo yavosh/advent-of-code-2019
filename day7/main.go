@@ -9,8 +9,8 @@ import (
 	"github.com/yavosh/advent-of-code-2019/computer"
 )
 
-func thrusters(code string, input []int) int {
-	codeInput := []int{0, 0}
+func thrusters(code string, input []int64) int64 {
+	codeInput := []int64{0, 0}
 	for thrusterNumber, thrusterInput := range input {
 		codeInput[0] = thrusterInput
 		fmt.Printf("int: thruster:%d %v\n", thrusterNumber+1, codeInput)
@@ -23,20 +23,20 @@ func thrusters(code string, input []int) int {
 	return codeInput[1]
 }
 
-func thrustersParallel(code string, input []int) int {
+func thrustersParallel(code string, input []int64) int64 {
 
 	type Thruster struct {
 		mu        *sync.Mutex
 		name      string
 		codeValue string
-		result    int
-		input     chan int
-		output    chan int
-		exit      chan int
+		result    int64
+		input     chan int64
+		output    chan int64
+		exit      chan int64
 		done      bool
 	}
 
-	runThruster := func(t *Thruster, wg *sync.WaitGroup) int {
+	runThruster := func(t *Thruster, wg *sync.WaitGroup) int64 {
 		defer wg.Done()
 		memory := computer.LoadInstructions(t.codeValue)
 		_, lastOutput := computer.RunWithChannels(memory, t.name, t.input, t.output, t.exit)
@@ -47,41 +47,41 @@ func thrustersParallel(code string, input []int) int {
 	thrusterE := &Thruster{
 		name:      "E",
 		codeValue: code,
-		input:     make(chan int),
-		output:    make(chan int),
-		exit:      make(chan int),
+		input:     make(chan int64),
+		output:    make(chan int64),
+		exit:      make(chan int64),
 	}
 
 	thrusterD := &Thruster{
 		name:      "D",
 		codeValue: code,
-		input:     make(chan int),
-		output:    make(chan int),
-		exit:      make(chan int)}
+		input:     make(chan int64),
+		output:    make(chan int64),
+		exit:      make(chan int64)}
 
 	thrusterC := &Thruster{
 		name:      "C",
 		codeValue: code,
-		input:     make(chan int),
-		output:    make(chan int),
-		exit:      make(chan int),
+		input:     make(chan int64),
+		output:    make(chan int64),
+		exit:      make(chan int64),
 	}
 
 	thrusterB := &Thruster{
 		name:      "B",
 		codeValue: code,
-		input:     make(chan int),
-		output:    make(chan int),
-		exit:      make(chan int),
+		input:     make(chan int64),
+		output:    make(chan int64),
+		exit:      make(chan int64),
 	}
 
 	thrusterA := &Thruster{
 		mu:        &sync.Mutex{},
 		name:      "A",
 		codeValue: code,
-		input:     make(chan int, 5),
-		output:    make(chan int),
-		exit:      make(chan int),
+		input:     make(chan int64, 5),
+		output:    make(chan int64),
+		exit:      make(chan int64),
 	}
 
 	var wg sync.WaitGroup
@@ -177,8 +177,8 @@ func singlePass() {
 		panic(err)
 	}
 
-	maxValue := 0
-	var maxInput []int
+	maxValue := int64(0)
+	var maxInput []int64
 
 	for _, input := range permutations {
 		out := thrusters(string(thrusterCode), input)
@@ -198,8 +198,8 @@ func parallel() {
 		panic(err)
 	}
 
-	maxValue := 0
-	var maxInput []int
+	maxValue := int64(0)
+	var maxInput []int64
 
 	for _, input := range permutations5to9 {
 		fmt.Printf("input=%v\n", input)

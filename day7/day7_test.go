@@ -20,26 +20,26 @@ var (
 )
 
 func TestAmplifierSoftwareA(t *testing.T) {
-	out := thrusters(testProgram1, []int{4, 3, 2, 1, 0})
-	assert.Equal(t, 43210, out)
+	out := thrusters(testProgram1, []int64{4, 3, 2, 1, 0})
+	assert.Equal(t, int64(43210), out)
 }
 
 func TestAmplifierSoftwareB(t *testing.T) {
-	out := thrusters(testProgram2, []int{0, 1, 2, 3, 4})
-	assert.Equal(t, 54321, out)
+	out := thrusters(testProgram2, []int64{0, 1, 2, 3, 4})
+	assert.Equal(t, int64(54321), out)
 }
 
 func TestAmplifierSoftwareC(t *testing.T) {
-	out := thrusters(testProgram3, []int{1, 0, 4, 3, 2})
-	assert.Equal(t, 65210, out)
+	out := thrusters(testProgram3, []int64{1, 0, 4, 3, 2})
+	assert.Equal(t, int64(65210), out)
 }
 
 func TestAmplifierParallelA(t *testing.T) {
-	out := thrustersParallel(testProgram4, []int{9, 8, 7, 6, 5})
-	assert.Equal(t, 139629729, out)
+	out := thrustersParallel(testProgram4, []int64{9, 8, 7, 6, 5})
+	assert.Equal(t, int64(139629729), out)
 }
 
 func TestAmplifierParallelB(t *testing.T) {
-	out := thrustersParallel(testProgram5, []int{9, 7, 8, 5, 6})
-	assert.Equal(t, 18216, out)
+	out := thrustersParallel(testProgram5, []int64{9, 7, 8, 5, 6})
+	assert.Equal(t, int64(18216), out)
 }

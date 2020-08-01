@@ -110,9 +110,16 @@ func opOutput(baseAddress int64, codeRun int64, flags *[]int, mem *[]int64, outp
 	return codeRun + 2
 }
 
-func opOutputIntoChannel(name string, codeRun int64, flags *[]int, mem *[]int64, output chan int64) (int64, int64) {
+func opOutputIntoChannel(baseAddress int64, name string, codeRun int64, flags *[]int, mem *[]int64, output chan int64) (int64, int64) {
 	if (*flags)[0] > 0 {
-		left := getValueImmediate(codeRun+1, mem)
+		left := int64(0)
+
+		// left := getValueImmediate(codeRun+1, mem)
+		if (*flags)[0] == 2 {
+			left = getValueByAddressRelative(baseAddress, codeRun+1, mem)
+		} else {
+			left = getValueImmediate(codeRun+1, mem)
+		}
 		fmt.Printf("* DEBUG OUTPUT: codeRun=%d left=%d  \n", codeRun, left)
 		output <- left
 		return codeRun + 2, left
@@ -231,6 +238,7 @@ func Run(memory []int64, input []int64) ([]int64, []int64) {
 			//fmt.Printf("new base address: (flag:%d) %d\n", flags[0], baseAddress)
 			codeRun = codeRun + 2
 		case opCodeExit:
+			fmt.Printf("EXIT instruction %d at addr %d\n", opcode, codeRun)
 			done = true
 		}
 	}
@@ -257,6 +265,8 @@ func RunWithChannels(memory []int64, name string, input chan int64, output chan 
 			int(instruction/10000) % 10,
 		}
 
+		//fmt.Printf("OP CODE addr=%d opcode=%d flags=%v opcodeValues=%v\n", codeRun, opcode, flags, memory[codeRun:codeRun+4])
+
 		switch opcode {
 		default:
 			fmt.Printf("Unknown instruction %d at addr %d\n", opcode, codeRun)
@@ -269,7 +279,7 @@ func RunWithChannels(memory []int64, name string, input chan int64, output chan 
 			codeRun = opInputFromChannel(name, codeRun, &flags, &memory, input)
 			intputIndex++
 		case opCodeOutput:
-			codeRun, lastOutput = opOutputIntoChannel(name, codeRun, &flags, &memory, output)
+			codeRun, lastOutput = opOutputIntoChannel(baseAddress, name, codeRun, &flags, &memory, output)
 		case opCodeJumpIfTrue:
 			codeRun = opJumpTrue(baseAddress, codeRun, &flags, &memory)
 		case opCodeJumpIfFalse:
@@ -278,8 +288,14 @@ func RunWithChannels(memory []int64, name string, input chan int64, output chan 
 			codeRun = opLessThan(baseAddress, codeRun, &flags, &memory)
 		case opCodeEquals:
 			codeRun = opEquals(baseAddress, codeRun, &flags, &memory)
+		case opCodeSetBase:
+			value := getValueBy(baseAddress, codeRun+1, flags[0], &memory)
+			baseAddress = baseAddress + value
+			fmt.Printf("new base address: (flag:%d) %d\n", flags[0], baseAddress)
+			codeRun = codeRun + 2
 		case opCodeExit:
 			done = true
+			fmt.Printf("EXIT instruction %d at addr %d\n", opcode, codeRun)
 			exit <- lastOutput
 		}
 	}
