@@ -90,6 +90,13 @@ func opInputFromChannel(name string, codeRun int64, flags *[]int, mem *[]int64, 
 	return codeRun + 2
 }
 
+func opInputFromCallback(name string, codeRun int64, flags *[]int, mem *[]int64, input func() int64) int64 {
+	inputValue := input()
+	left := getValueImmediate(codeRun+1, mem)
+	(*mem)[left] = inputValue
+	return codeRun + 2
+}
+
 func opOutput(baseAddress int64, codeRun int64, flags *[]int, mem *[]int64, output *[]int64) int64 {
 	if (*flags)[0] > 0 {
 		left := int64(0)
@@ -120,13 +127,13 @@ func opOutputIntoChannel(baseAddress int64, name string, codeRun int64, flags *[
 		} else {
 			left = getValueImmediate(codeRun+1, mem)
 		}
-		fmt.Printf("* DEBUG OUTPUT: codeRun=%d left=%d  \n", codeRun, left)
+		//fmt.Printf("* DEBUG OUTPUT: codeRun=%d left=%d  \n", codeRun, left)
 		output <- left
 		return codeRun + 2, left
 	}
 
 	left := getValueByAddress(codeRun+1, mem)
-	fmt.Printf("* DEBUG OUTPUT: codeRun=%d left=%d\n", codeRun, left)
+	//fmt.Printf("* DEBUG OUTPUT: codeRun=%d left=%d\n", codeRun, left)
 	output <- left
 	return codeRun + 2, left
 }
@@ -291,13 +298,71 @@ func RunWithChannels(memory []int64, name string, input chan int64, output chan 
 		case opCodeSetBase:
 			value := getValueBy(baseAddress, codeRun+1, flags[0], &memory)
 			baseAddress = baseAddress + value
-			fmt.Printf("new base address: (flag:%d) %d\n", flags[0], baseAddress)
+			//fmt.Printf("new base address: (flag:%d) %d\n", flags[0], baseAddress)
 			codeRun = codeRun + 2
 		case opCodeExit:
 			done = true
 			fmt.Printf("EXIT instruction %d at addr %d\n", opcode, codeRun)
 			exit <- lastOutput
 		}
+	}
+
+	return memory, lastOutput
+}
+
+// RunWithChannelsCallback run but inputs and outputs are callbacks
+func RunWithChannelsCallback(memory []int64, name string, input func() int64, output chan int64, exit chan int64) ([]int64, int64) {
+	var baseAddress = int64(0)
+
+	var intputIndex = 0
+	var lastOutput = int64(0)
+
+	var codeRun = int64(0)
+	var done = false
+	for !done {
+		instruction := memory[codeRun]
+		opcode := int(instruction % 100)
+
+		flags := []int{
+			int(instruction/100) % 10,
+			int(instruction/1000) % 10,
+			int(instruction/10000) % 10,
+		}
+
+		//fmt.Printf("OP CODE addr=%d opcode=%d flags=%v opcodeValues=%v\n", codeRun, opcode, flags, memory[codeRun:codeRun+4])
+
+		switch opcode {
+		default:
+			fmt.Printf("Unknown instruction %d at addr %d\n", opcode, codeRun)
+			os.Exit(99)
+		case opCodeAdd:
+			codeRun = opAdd(baseAddress, codeRun, &flags, &memory)
+		case opCodeMult:
+			codeRun = opMult(baseAddress, codeRun, &flags, &memory)
+		case opCodeInput:
+			codeRun = opInputFromCallback(name, codeRun, &flags, &memory, input)
+			intputIndex++
+		case opCodeOutput:
+			codeRun, lastOutput = opOutputIntoChannel(baseAddress, name, codeRun, &flags, &memory, output)
+		case opCodeJumpIfTrue:
+			codeRun = opJumpTrue(baseAddress, codeRun, &flags, &memory)
+		case opCodeJumpIfFalse:
+			codeRun = opJumpFalse(baseAddress, codeRun, &flags, &memory)
+		case opCodeLessThan:
+			codeRun = opLessThan(baseAddress, codeRun, &flags, &memory)
+		case opCodeEquals:
+			codeRun = opEquals(baseAddress, codeRun, &flags, &memory)
+		case opCodeSetBase:
+			value := getValueBy(baseAddress, codeRun+1, flags[0], &memory)
+			baseAddress = baseAddress + value
+			//fmt.Printf("new base address: (flag:%d) %d\n", flags[0], baseAddress)
+			codeRun = codeRun + 2
+		case opCodeExit:
+			done = true
+			fmt.Printf("EXIT instruction %d at addr %d\n", opcode, codeRun)
+			exit <- lastOutput
+		}
+
 	}
 
 	return memory, lastOutput

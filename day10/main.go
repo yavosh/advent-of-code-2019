@@ -5,15 +5,9 @@ import (
 	"math"
 	"sort"
 	"strings"
-)
 
-// AbsInt .
-func AbsInt(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
+	"github.com/yavosh/advent-of-code-2019/util"
+)
 
 // https://stackoverflow.com/questions/11907947/how-to-check-if-a-point-lies-on-a-line-between-2-other-points
 func pointOnLine(p1 []int, p2 []int, targetPoint []int) bool {
@@ -82,7 +76,7 @@ func pointOnLineBetween(p1 []int, p2 []int, targetPoint []int) bool {
 		return false
 	}
 
-	if AbsInt(dxl) >= AbsInt(dyl) {
+	if util.AbsInt(dxl) >= util.AbsInt(dyl) {
 		if dxl > 0 {
 			return p1[0] <= targetPoint[0] && targetPoint[0] <= p2[0]
 		} else {

@@ -5,6 +5,8 @@ import (
 	"math/big"
 	"strconv"
 	"strings"
+
+	"github.com/yavosh/advent-of-code-2019/util"
 )
 
 const (
@@ -71,16 +73,16 @@ func (moon *Moon) IsSamePosition(other Moon) bool {
 
 // PotentialEnergy .
 func (moon *Moon) PotentialEnergy() int {
-	return AbsInt(moon.position.x) +
-		AbsInt(moon.position.y) +
-		AbsInt(moon.position.z)
+	return util.AbsInt(moon.position.x) +
+		util.AbsInt(moon.position.y) +
+		util.AbsInt(moon.position.z)
 }
 
 // KineticEnergy .
 func (moon *Moon) KineticEnergy() int {
-	return AbsInt(moon.velocity.x) +
-		AbsInt(moon.velocity.y) +
-		AbsInt(moon.velocity.z)
+	return util.AbsInt(moon.velocity.x) +
+		util.AbsInt(moon.velocity.y) +
+		util.AbsInt(moon.velocity.z)
 }
 
 // TotalEnergy .

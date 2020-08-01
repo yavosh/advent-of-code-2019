@@ -5,6 +5,8 @@ import (
 	"math"
 	"strconv"
 	"strings"
+
+	"github.com/yavosh/advent-of-code-2019/util"
 )
 
 // Point .
@@ -59,14 +61,6 @@ func (l *Line) String() string {
 	return fmt.Sprintf("l{start:%s,end:%s}", l.Start, l.End)
 }
 
-// AbsInt .
-func AbsInt(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
 // ClosestIntersectPointDistance .
 func ClosestIntersectPointDistance(linesA []Line, linesB []Line) int {
 
@@ -74,7 +68,7 @@ func ClosestIntersectPointDistance(linesA []Line, linesB []Line) int {
 	points := IntersectingPointsOnLines(linesA, linesB)
 
 	for _, point := range points {
-		distance := AbsInt(point.X) + AbsInt(point.Y)
+		distance := util.AbsInt(point.X) + util.AbsInt(point.Y)
 
 		if smallestDistance == -1 || distance < smallestDistance {
 			smallestDistance = distance
@@ -109,7 +103,7 @@ func LessIntersectSteps(linesA []Line, linesB []Line) int {
 	points := IntersectingPointsOnLines(linesA, linesB)
 
 	for _, point := range points {
-		distance := AbsInt(point.X) + AbsInt(point.Y)
+		distance := util.AbsInt(point.X) + util.AbsInt(point.Y)
 
 		if smallestDistance == -1 || distance < smallestDistance {
 			smallestDistance = distance
