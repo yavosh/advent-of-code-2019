@@ -350,7 +350,6 @@ func main() {
 
 			if value == TileTypeBall || value == TileTypePaddle {
 				game.setInput()
-
 			}
 
 		case out := <-exit:
