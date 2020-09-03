@@ -6,9 +6,6 @@ import (
 )
 
 func solve3(amount int, recipes map[string]reactionType) (int, map[string]int, int) {
-
-	//fmt.Println("recipes", recipes)
-
 	var oreNeeded = 0
 	var supply = make(map[string]int)
 
@@ -36,24 +33,17 @@ func solve3(amount int, recipes map[string]reactionType) (int, map[string]int, i
 			recipe := recipes[order.symbol]
 
 			batches := int(math.Ceil(float64(amountNeeded) / float64(recipe.output.q)))
-			//fmt.Println("batches", batches, amountNeeded, recipe.output.q)
-
 			for _, ingredient := range recipe.inputs {
 				orders = append(orders, elementType{symbol: ingredient.symbol, q: ingredient.q * batches})
 			}
 
 			leftoverAmount := batches*recipe.output.q - amountNeeded
-			//fmt.Println("leftoverAmount", leftoverAmount, recipe.output.q, amountNeeded)
-
-			//leftoverAmount := amountNeeded - batches*recipe.output.q
 			supply[order.symbol] = leftoverAmount
-			//fmt.Println("supply", supply)
 		}
 
 	}
 
 	return oreNeeded, supply, 0
-
 }
 
 func solve3Part2(recipes map[string]reactionType) int {
